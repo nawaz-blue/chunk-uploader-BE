@@ -13,13 +13,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/get-pre-signed-url", (req, res) => {
-  const { filename } = req.query;
 
-  const folderName = "MyFolder/";
+app.get("/get-pre-signed-url", (req, res) => {
+  const { filename, folderName } = req.query;
   const params = {
     Bucket: "ply-models",
-    Key: folderName + filename, // include the folder name as prefix
+    Key: folderName + '/' + filename,
     Expires: 60,
     ContentType: "application/octet-stream",
   };
