@@ -60,8 +60,8 @@ app.get("/:folderId/get-files", (req, res) => {
       if (err) {
         console.log(err, err.stack); // an error occurred
       } else {
-        console.log(data);
-        res.status(200).json({ data });
+        const bucketUrl = 'https://ply-models.s3.ap-south-1.amazonaws.com/'
+        res.status(200).json({ data: data.Contents.map((obj) => `${bucketUrl}${obj.Key}`) });
       } // successful response
     });
   } catch (err) {
