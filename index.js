@@ -13,12 +13,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 app.get("/get-pre-signed-url", (req, res) => {
   const { filename, folderName } = req.query;
   const params = {
     Bucket: "ply-models",
-    Key: folderName + '/' + filename,
+    Key: folderName + "/" + filename,
     Expires: 60,
     ContentType: "application/octet-stream",
   };
@@ -27,6 +26,47 @@ app.get("/get-pre-signed-url", (req, res) => {
     if (err) return res.status(500).send(err);
     res.status(200).json({ url });
   });
+});
+
+// Get all directories
+app.get("/get-dir", (req, res) => {
+  try {
+    var params = {
+      Bucket: "ply-models",
+      Delimiter: "/",
+      // Key: folderName + '/' + filename,  // Can be your folder name
+    };
+    s3.listObjectsV2(params, function (err, data) {
+      if (err) {
+        console.log(err, err.stack); // an error occurred
+      } else {
+        console.log(data);
+        res.status(200).json({ data: data.CommonPrefixes.map((obj) => obj.Prefix) });
+      } // successful response
+    });
+  } catch (err) {
+    console.err(err);
+  }
+});
+
+// Get all files inside folder
+app.get("/:folderId/get-files", (req, res) => {
+  try {
+    var params = {
+      Bucket: "ply-models",
+      Prefix: req.params.folderId,  // Can be your folder name
+    };
+    s3.listObjectsV2(params, function (err, data) {
+      if (err) {
+        console.log(err, err.stack); // an error occurred
+      } else {
+        console.log(data);
+        res.status(200).json({ data });
+      } // successful response
+    });
+  } catch (err) {
+    console.err(err);
+  }
 });
 
 app.listen(3001, () => {
